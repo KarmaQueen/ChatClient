@@ -19,6 +19,7 @@ public class ChatClient implements Runnable {
         try {
             socket = new Socket(serverName, serverPort);
             System.out.println("Connected: " + socket);
+            System.out.println("Welcome!");
             start();
         } catch (UnknownHostException uhe) {
             System.out.println("Host unknown: " + uhe.getMessage());

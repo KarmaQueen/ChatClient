@@ -59,7 +59,8 @@ public class ChatServer implements Runnable {
 
     public synchronized void handle(int ID, String input) {
         ChatServerThread client = clients[findClient(ID)];
-        if(input.charAt(0) == '/'){
+        if(input.length() < 1) return;
+        if("/".equals(input.substring(0,1))){
             if (input.equals("/quit")) {
                 client.send("/quit");
                 broadcast("[" + client.getChatterName() + " has left the chat]");

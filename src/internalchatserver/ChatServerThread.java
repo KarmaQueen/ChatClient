@@ -6,6 +6,7 @@ package internalchatserver;
 
 import java.net.*;
 import java.io.*;
+import java.security.PublicKey;
 
 public class ChatServerThread extends Thread {
 
@@ -16,6 +17,7 @@ public class ChatServerThread extends Thread {
     private DataOutputStream streamOut = null;
     private volatile boolean done = false;
     private String name = null;
+    private PublicKey publicKey = null;
 
     public ChatServerThread(ChatServer _server, Socket _socket) {
         super();
@@ -35,6 +37,25 @@ public class ChatServerThread extends Thread {
             //stop();
             done = true;
         }
+    }
+
+    public void sendBytes(byte[] msg){
+        try{
+            streamOut.write(msg);
+            streamOut.flush();
+        } catch(Exception e){
+            System.out.println(ID + " ERROR sending: " + e.getMessage());
+            server.remove(ID);
+            done = true;
+        }
+    }
+
+    public void setPublicKey(PublicKey key){
+        publicKey = key;
+    }
+
+    public PublicKey getPublicKey(){
+        return publicKey;
     }
 
     public String getChatterName(){
