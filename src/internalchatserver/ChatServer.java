@@ -59,22 +59,8 @@ public class ChatServer implements Runnable {
 
     public synchronized void handle(int ID, String input) {
         ChatServerThread client = clients[findClient(ID)];
-        if(input.length() < 1) return;
-        if("/".equals(input.substring(0,1))){
-            if (input.equals("/quit")) {
-                client.send("/quit");
-                broadcast("[" + client.getChatterName() + " has left the chat]");
-                remove(ID);
-            } else if(input.length() > 6 && input.substring(0, 6).equals("/name ")){
-                String oldName = client.setChatterName(input.substring(6));
-                for(int i = 0; i < clientCount; i++){
-                    clients[i].send("[" + oldName + " changed their name to " + input.substring(6) + "]");
-                }
-            }
-        }
-        else
-            for (int i = 0; i < clientCount; i++)
-                clients[i].send(client.getChatterName() + ": " + input);
+        for (int i = 0; i < clientCount; i++)
+            clients[i].send(input);
     }
 
     public synchronized void broadcast(String input){
@@ -109,6 +95,9 @@ public class ChatServer implements Runnable {
                 clients[clientCount].open();
                 clients[clientCount].start();
                 broadcast("[" + clients[clientCount].getChatterName() + " has joined the chat]");
+
+                //TODO: some init stuff, exchange public keys
+
                 clientCount++;
             } catch (IOException ioe) {
                 System.out.println("Error opening thread: " + ioe);
