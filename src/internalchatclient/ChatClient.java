@@ -70,6 +70,7 @@ public class ChatClient implements Runnable {
             socket = new Socket(serverName, serverPort);
             ps.println("Connected: " + socket);
             ps.println("Welcome!");
+            ps.println("This chat is encrypted using RSA-2048.");
             start();
         } catch (UnknownHostException uhe) {
             ps.println("Host unknown: " + uhe.getMessage());
@@ -185,8 +186,8 @@ public class ChatClient implements Runnable {
             case "dst":
                 String key = str.substring(4);
                 if (!key.equals(encryptionManager.getEncodedPublicKey())) {
-                    encryptionManager.addToChain(key);
-                    ps.println("[Added Public Key to keychain: " + key + "]");
+                    if(encryptionManager.addToChain(key))
+                        ps.println("[Added Public Key to keychain: " + key + "]");
 
                     //Send Key
                     try {
@@ -197,14 +198,16 @@ public class ChatClient implements Runnable {
                     }
 
                 } else {
-                    //ps.println("This is your Public Key: " + str.substring(4));
+                    ps.println("This is your Public Key: " + str.substring(4));
                 }
                 return;
             case "add":
                 String key2 = str.substring(4);
-                if (!key2.equals(encryptionManager.getEncodedPublicKey())) {
-                    encryptionManager.addToChain(key2);
-                    ps.println("[Received Public Key: " + key2 + "]");
+                ps.println("[Received Public Key: " + key2 + "]");
+                if(encryptionManager.addToChain(key2)){
+                    ps.println("[Added key to keychain]");
+                } else {
+                    ps.println("[Key already exists, so it was not added]");
                 }
                 return;
             default:

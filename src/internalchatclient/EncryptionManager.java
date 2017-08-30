@@ -43,12 +43,12 @@ public class EncryptionManager extends EncryptionHelper{
     public boolean addToChain(String encodedKey) {
         try {
             PublicKey key = EncryptionHelper.byteArrayToPublicKey(stringToByteArray(encodedKey));
-            keychain.add(key);
-            return true;
-        } catch(NoSuchAlgorithmException e){
-            e.printStackTrace();
-            System.out.println("This is never supposed to show up");
-        } catch(InvalidKeySpecException e){
+            if(!keychain.contains(key)) {
+                keychain.add(key);
+                return true;
+            }
+            return false;
+        } catch(Exception e){
             e.printStackTrace();
         } finally {
             return false;
