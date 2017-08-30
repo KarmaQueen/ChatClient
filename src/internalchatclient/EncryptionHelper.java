@@ -15,6 +15,7 @@ import java.util.Base64;
  */
 public class EncryptionHelper {
 
+    /*
     public static void main(String[] args){
         try{
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -35,8 +36,8 @@ public class EncryptionHelper {
 
         }
     }
-//
-    @NotNull
+    */
+
     public static String encryptWithPublicKey(byte[] message, PublicKey publicKey)
             throws Exception {
 
@@ -78,6 +79,13 @@ public class EncryptionHelper {
         return KeyFactory.getInstance("RSA").generatePublic(
                 new X509EncodedKeySpec(encoded)
         );
+    }
+
+    public static String byteArrayToString(byte[] bytes){
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+    public static byte[] stringToByteArray(String str){
+        return Base64.getDecoder().decode(str);
     }
 
 }

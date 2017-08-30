@@ -77,6 +77,9 @@ public class ChatServerThread extends Thread {
     @Override
     public synchronized void run() {
         System.out.println("Server Thread " + ID + " running.");
+
+        initThread();
+
         while (!done) {
             try {
                 server.handle(ID, streamIn.readUTF());
@@ -87,6 +90,10 @@ public class ChatServerThread extends Thread {
                 done = true;
             }
         }
+    }
+
+    public void initThread(){
+
     }
 
     public void open() throws IOException {

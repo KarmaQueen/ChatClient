@@ -21,12 +21,16 @@ public class ChatClient implements Runnable {
     private ChatClientThread client = null;
     private PrintStream ps = null;
 
+    private boolean debug = true;
+
     static Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
 
     static TrayIcon trayIcon = new TrayIcon(image, "Tester2");
 
     private String name = "Default";
     private boolean notifications = true;
+
+    private EncryptionManager encryptionManager = null;
 
     public ChatClient(String serverName, int serverPort){
         this(serverName, serverPort, System.out);
@@ -39,6 +43,9 @@ public class ChatClient implements Runnable {
             System.out.println("ERROR: PrintStream is null, reverting to System.out");
             ps = System.out;
         } else this.ps = ps;
+
+        //Init EncryptionManager
+        encryptionManager = EncryptionManager.getInstance();
 
         //Setting up SystemTray
         ps.println("SystemTray is" + (SystemTray.isSupported()?"":" not") + " supported!");
@@ -74,6 +81,17 @@ public class ChatClient implements Runnable {
 
     public void run() {
         Thread thread = Thread.currentThread();
+
+        // Distribute Public Key
+        try{
+            streamOut.writeUTF(encryptionManager.getDistributeKeyProtocol());
+            streamOut.flush();
+        } catch(IOException ioe){
+            ps.println("Sending error: " + ioe.getMessage());
+            stop();
+        }
+
+
         while (this.thread == thread) {
             try {
                 input = console.readLine();
@@ -138,11 +156,20 @@ public class ChatClient implements Runnable {
         }
     }
 
+    public void parseProtocol(String str){
+        if(str.length() <= 5)
+            if(debug)
+                ps.println("Protocol Received is Invalid: " + str);
+        String protocol = str.substring(0, 3);
+
+    }
+
     /**
      * Handle incoming messages from the server.
      * @param msg
      */
     public void handle(String msg) {
+        parseProtocol(msg);
         ps.println(msg);
         showNotification("InternalChat", msg, null);
     }
