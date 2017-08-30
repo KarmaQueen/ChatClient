@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.*;
 import java.io.*;
+import java.security.PublicKey;
 
 public class ChatClient implements Runnable {
     private Socket socket = null;
@@ -21,7 +22,7 @@ public class ChatClient implements Runnable {
     private ChatClientThread client = null;
     private PrintStream ps = null;
 
-    private boolean debug = true;
+    private boolean debug = false;
 
     static Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
 
@@ -48,7 +49,7 @@ public class ChatClient implements Runnable {
         encryptionManager = EncryptionManager.getInstance();
 
         //Setting up SystemTray
-        ps.println("SystemTray is" + (SystemTray.isSupported()?"":" not") + " supported!");
+        ps.println("SystemTray is" + (SystemTray.isSupported()?"":" NOT") + " supported!");
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
 
@@ -91,7 +92,6 @@ public class ChatClient implements Runnable {
             stop();
         }
 
-
         while (this.thread == thread) {
             try {
                 input = console.readLine();
@@ -117,6 +117,7 @@ public class ChatClient implements Runnable {
      * @param input
      * @return boolean whether to send the text to the server
      */
+    //TODO: parseCommand
     public boolean parseCommand(String input){
         if(input == null || input.length() < 1) return false;
         if(input.charAt(0) == '/') {
@@ -129,39 +130,101 @@ public class ChatClient implements Runnable {
                     return false;
                 case "/name":
                     if(arr.length >= 2) {
+                        this.input = "msg [" + this.name + " changed their name to " + arr[1] + "]";
                         this.name = arr[1];
-                        ps.println("[ Name changed to " + this.name + " ]");
+                        ps.println(this.input.substring(4));
+                        sendEncryptedMessage(this.input);
+                        return true;
                     } else {
-                        ps.println("[ Wrong Syntax: /name [name] ]");
+                        ps.println("[Wrong Syntax: /name [name]]");
+                        return false;
                     }
-                    return false;
                 case "/notif":
                     if(arr.length >= 2){
-                        if(arr[1] == "on") notifications = true;
-                        else if(arr[1] == "off") notifications = false;
-                        else
-                            ps.println("[ Wrong Syntax: /notif {'on':'off'} ]");
+                        if("on".equals(arr[1])) notifications = true;
+                        else if("off".equals(arr[1])) notifications = false;
+                        else {
+                            ps.println("[Wrong Syntax: /notif {'on':'off'}]");
+                            return false;
+                        }
                     } else {
                         notifications = !notifications;
                     }
-                    ps.println("[ Notifiations are now " + (notifications?"on ]":"off ]"));
+                    ps.println("[Notifiations are now " + (notifications?"on]":"off]"));
                     return false;
                 default:
-                    ps.println("[ Unknown Command or Wrong Syntax: " + input + " ]");
+                    ps.println("[Unknown Command or Wrong Syntax: " + input + "]");
                     return false;
             }
         } else {
-            this.input = "MSG:" + name + ": " + input;
-            return true;
+            this.input = "msg " + name + ": " + input;
+            ps.println(this.input.substring(4));
+            sendEncryptedMessage(this.input);
+            return false;
         }
     }
 
+    public void sendEncryptedMessage(String str){
+        for(PublicKey key : encryptionManager.getKeyChain()){
+            try {
+                streamOut.writeUTF(encryptionManager.encrypt(str, key));
+                streamOut.flush();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //TODO: parseProtocol
     public void parseProtocol(String str){
         if(str.length() <= 5)
             if(debug)
                 ps.println("Protocol Received is Invalid: " + str);
         String protocol = str.substring(0, 3);
+        switch(protocol) {
+            case "dst":
+                String key = str.substring(4);
+                if (!key.equals(encryptionManager.getEncodedPublicKey())) {
+                    encryptionManager.addToChain(key);
+                    ps.println("[Added Public Key to keychain: " + key + "]");
 
+                    //Send Key
+                    try {
+                        streamOut.writeUTF(encryptionManager.getAddKeyProtocol());
+                        streamOut.flush();
+                    } catch (IOException ioe) {
+                        ps.println("Sending Error: " + ioe.getMessage());
+                    }
+
+                } else {
+                    //ps.println("This is your Public Key: " + str.substring(4));
+                }
+                return;
+            case "add":
+                String key2 = str.substring(4);
+                if (!key2.equals(encryptionManager.getEncodedPublicKey())) {
+                    encryptionManager.addToChain(key2);
+                    ps.println("[Received Public Key: " + key2 + "]");
+                }
+                return;
+            default:
+        }
+
+        //decrypt and attempt to resolve encrypted message
+        String decrypted = encryptionManager.decrypt(str);
+        if(decrypted == null) {
+            //ps.println("[Decryption Failed!]");
+        }
+        else {
+            switch(decrypted.substring(0, 3)) {
+                case "msg":
+                    ps.println(decrypted.substring(4));
+                    showNotification("InternalChat", decrypted.substring(4), null);
+                default:
+                    if(debug) ps.println("Unknown Protocol: " + str);
+                    return;
+            }
+        }
     }
 
     /**
@@ -169,9 +232,9 @@ public class ChatClient implements Runnable {
      * @param msg
      */
     public void handle(String msg) {
+//        if(debug)
+//            ps.println("raw input: " + msg);
         parseProtocol(msg);
-        ps.println(msg);
-        showNotification("InternalChat", msg, null);
     }
 
     public void showNotification(String title, String message, @Nullable String location){

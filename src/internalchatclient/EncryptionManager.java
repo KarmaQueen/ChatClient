@@ -55,6 +55,10 @@ public class EncryptionManager extends EncryptionHelper{
         }
     }
 
+    public ArrayList<PublicKey> getKeyChain(){
+        return keychain;
+    }
+
     public String getEncodedPublicKey(){
         return byteArrayToString(publicKeyToByteArray(publicKey));
     }
@@ -63,6 +67,26 @@ public class EncryptionManager extends EncryptionHelper{
         return "dst " + getEncodedPublicKey();
     }
 
+    public String getAddKeyProtocol(){
+        return "add " + getEncodedPublicKey();
+    }
 
+    public String encrypt(String str, PublicKey publicKey){
+        try {
+            return EncryptionHelper.encryptWithPublicKey(str, publicKey);
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String decrypt(String str){
+        try{
+            return EncryptionHelper.decryptWithPrivateKey(str, privateKey);
+        } catch(Exception e){
+            //e.printStackTrace();
+            return null;
+        }
+    }
 
 }
