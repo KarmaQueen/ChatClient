@@ -49,50 +49,28 @@ public class ChatClientSimpleGUI extends Applet implements ActionListener{
         send.setEnabled(false);
         connect.setEnabled(true);
 
-        quit.setActionCommand("quit");
-        send.setActionCommand("send");
-        connect.setActionCommand("connect");
-
         quit.addActionListener(e -> quit());
-
         send.addActionListener(e -> send());
-
         connect.addActionListener(e -> connect());
-
         input.addActionListener(e ->{
             if(client.isConnected()){
                 send();
             }
         });
-
+        display.setEditable(false);
     }
 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if(e.getSource().equals(connect)){
             connect();
         }
-
-        /*
-        switch(e.getActionCommand()){
-            case quit:
-                quit();
-                return;
-            case "send":
-                send();
-                return;
-            case "connect":
-                connect();
-                return;
-            default:
-                System.out.println("WHAT");
-        }
-        */
     }
 
     private void quit(){
+
+        System.exit(0);
         input.setText("/quit");
         send();
         client = null;
