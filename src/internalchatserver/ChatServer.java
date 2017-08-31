@@ -58,9 +58,10 @@ public class ChatServer implements Runnable {
     }
 
     public synchronized void handle(int ID, String input) {
-        ChatServerThread client = clients[findClient(ID)];
+        //ChatServerThread client = clients[findClient(ID)];
         for (int i = 0; i < clientCount; i++)
-            clients[i].send(input);
+            if(clients[i].getID() != ID)
+                clients[i].send(input);
     }
 
     public synchronized void broadcast(String input){

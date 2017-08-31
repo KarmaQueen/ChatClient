@@ -21,23 +21,25 @@ public class ChatClient implements Runnable {
     private DataOutputStream streamOut = null;
     private ChatClientThread client = null;
     private PrintStream ps = null;
-
+    private String serverName = null;
+    private int serverPort = -1;
     private boolean debug = false;
 
     static Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
-
     static TrayIcon trayIcon = new TrayIcon(image, "Tester2");
 
     private String name = "Default";
     private boolean notifications = true;
-
     private EncryptionManager encryptionManager = null;
 
     public ChatClient(String serverName, int serverPort){
         this(serverName, serverPort, System.out);
     }
-
     public ChatClient(String serverName, int serverPort, @NotNull PrintStream ps) {
+
+        //Copy Elements
+        this.serverName = serverName;
+        this.serverPort = serverPort;
 
         //Setting up PrintStream
         if(ps == null){
@@ -106,6 +108,10 @@ public class ChatClient implements Runnable {
                 stop();
             }
         }
+    }
+
+    public boolean isConnected(){
+        return this.thread != null;
     }
 
     /**
@@ -267,6 +273,14 @@ public class ChatClient implements Runnable {
         }
         client.close();
         client.shutdown();
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public int getServerPort() {
+        return serverPort;
     }
 
     public static void main(String args[]) {

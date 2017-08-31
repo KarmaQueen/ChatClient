@@ -38,6 +38,7 @@ public class EncryptionHelper {
     }
     */
 
+
     public static String encryptWithPublicKey(byte[] message, PublicKey publicKey)
             throws Exception {
 
