@@ -286,6 +286,7 @@ public class ChatClient implements Runnable {
 
     public static void main(String args[]) {
         ChatClient client = new ChatClient("130.15.23.151",12345);
+        client.start();
 
     }
 }

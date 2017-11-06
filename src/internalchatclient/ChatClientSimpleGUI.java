@@ -96,6 +96,7 @@ public class ChatClientSimpleGUI extends Applet implements ActionListener{
         //System.setErr(ps);
 
         client = new ChatClient(serverName, serverPort, ps);
+        client.start();
 
         this.serverName = client.getServerName();
         this.serverPort = client.getServerPort();
