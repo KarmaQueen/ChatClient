@@ -8,12 +8,17 @@ import java.net.*;
 import java.io.*;
 
 public class ChatServer implements Runnable {
+    private int port;
     private ChatServerThread clients[] = new ChatServerThread[50];
     private ServerSocket server = null;
     private Thread thread = null;
     private int clientCount = 0;
 
     public ChatServer(int port) {
+        this.port = port;
+    }
+
+    public void startServer(){
         try {
             System.out.println("Binding to port " + port + ", please wait  ...");
             server = new ServerSocket(port);
@@ -118,5 +123,6 @@ public class ChatServer implements Runnable {
             */
 
         ChatServer server = new ChatServer(12345);
+        server.startServer();
     }
 }

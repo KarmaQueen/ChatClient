@@ -1,9 +1,5 @@
 package internalchatclient;
 
-import org.jetbrains.annotations.NotNull;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import javax.crypto.Cipher;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;

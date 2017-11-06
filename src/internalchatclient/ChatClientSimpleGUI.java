@@ -69,8 +69,6 @@ public class ChatClientSimpleGUI extends Applet implements ActionListener{
     }
 
     private void quit(){
-
-        System.exit(0);
         input.setText("/quit");
         send();
         client = null;
@@ -96,7 +94,7 @@ public class ChatClientSimpleGUI extends Applet implements ActionListener{
         //System.setErr(ps);
 
         client = new ChatClient(serverName, serverPort, ps);
-        client.start();
+        client.startClient();
 
         this.serverName = client.getServerName();
         this.serverPort = client.getServerPort();

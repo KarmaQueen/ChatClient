@@ -44,12 +44,12 @@ public class ChatClient implements Runnable {
         //Setting up PrintStream
         if(ps == null){
             System.out.println("ERROR: PrintStream is null, reverting to System.out");
-            ps = System.out;
+            this.ps = System.out;
         } else this.ps = ps;
 
     }
 
-    public void start(){
+    public void startClient(){
         //Init EncryptionManager
         encryptionManager = EncryptionManager.getInstance();
 
@@ -76,7 +76,7 @@ public class ChatClient implements Runnable {
             ps.println("Connected: " + socket);
             ps.println("Welcome!");
             ps.println("This chat is encrypted using RSA-2048.");
-            startThread();
+            start();
         } catch (UnknownHostException uhe) {
             ps.println("Host unknown: " + uhe.getMessage());
         } catch (IOException ioe) {
@@ -221,10 +221,7 @@ public class ChatClient implements Runnable {
 
         //decrypt and attempt to resolve encrypted message
         String decrypted = encryptionManager.decrypt(str);
-        if(decrypted == null) {
-            //ps.println("[Decryption Failed!]");
-        }
-        else {
+        if(decrypted != null){
             switch(decrypted.substring(0, 3)) {
                 case "msg":
                     ps.println(decrypted.substring(4));
@@ -253,7 +250,7 @@ public class ChatClient implements Runnable {
         }
     }
 
-    public void startThread() throws IOException {
+    public void start() throws IOException {
         console = new BufferedReader(new InputStreamReader(System.in));
         streamOut = new DataOutputStream(socket.getOutputStream());
         if (thread == null) {
@@ -286,7 +283,6 @@ public class ChatClient implements Runnable {
 
     public static void main(String args[]) {
         ChatClient client = new ChatClient("130.15.23.151",12345);
-        client.start();
-
+        client.startClient();
     }
 }

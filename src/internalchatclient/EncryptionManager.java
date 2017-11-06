@@ -1,7 +1,6 @@
 package internalchatclient;
 
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
 /**
@@ -48,11 +47,10 @@ public class EncryptionManager extends EncryptionHelper{
                 return true;
             }
             return false;
-        } catch(Exception e){
+        } catch(Exception e) {
             e.printStackTrace();
-        } finally {
-            return false;
         }
+        return false;
     }
 
     public ArrayList<PublicKey> getKeyChain(){
