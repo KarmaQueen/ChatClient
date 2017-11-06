@@ -23,8 +23,10 @@ public class ChatClient implements Runnable {
     private int serverPort = -1;
     private boolean debug = false;
 
-    static Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
-    static TrayIcon trayIcon = new TrayIcon(image, "Tester2");
+    private static Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
+    private static TrayIcon trayIcon = new TrayIcon(image, "Tester2");
+
+    private String input;
 
     private String name = "Default";
     private boolean notifications = true;
@@ -45,6 +47,9 @@ public class ChatClient implements Runnable {
             ps = System.out;
         } else this.ps = ps;
 
+    }
+
+    public void start(){
         //Init EncryptionManager
         encryptionManager = EncryptionManager.getInstance();
 
@@ -71,15 +76,13 @@ public class ChatClient implements Runnable {
             ps.println("Connected: " + socket);
             ps.println("Welcome!");
             ps.println("This chat is encrypted using RSA-2048.");
-            start();
+            startThread();
         } catch (UnknownHostException uhe) {
             ps.println("Host unknown: " + uhe.getMessage());
         } catch (IOException ioe) {
             ps.println("Unexpected exception: " + ioe.getMessage());
         }
     }
-
-    String input;
 
     public void run() {
         Thread thread = Thread.currentThread();
@@ -182,8 +185,7 @@ public class ChatClient implements Runnable {
 
     //TODO: parseProtocol
     public void parseProtocol(String str){
-        if(str.length() <= 5)
-            if(debug)
+        if(str.length() <= 5 && debug)
                 ps.println("Protocol Received is Invalid: " + str);
         String protocol = str.substring(0, 3);
         switch(protocol) {
@@ -227,6 +229,7 @@ public class ChatClient implements Runnable {
                 case "msg":
                     ps.println(decrypted.substring(4));
                     showNotification("InternalChat", decrypted.substring(4), null);
+                    break;
                 default:
                     if(debug) ps.println("Unknown Protocol: " + str);
                     return;
@@ -250,7 +253,7 @@ public class ChatClient implements Runnable {
         }
     }
 
-    public void start() throws IOException {
+    public void startThread() throws IOException {
         console = new BufferedReader(new InputStreamReader(System.in));
         streamOut = new DataOutputStream(socket.getOutputStream());
         if (thread == null) {
@@ -282,13 +285,6 @@ public class ChatClient implements Runnable {
     }
 
     public static void main(String args[]) {
-        /*
-        ChatClient client = null;
-        if (args.length != 2)
-            ps.println("Usage: java ChatClient host port");
-        else
-            client = new ChatClient(args[0], Integer.parseInt(args[1]));
-        */
         ChatClient client = new ChatClient("130.15.23.151",12345);
 
     }
