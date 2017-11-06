@@ -1,7 +1,7 @@
 package internalchatclient;
 
 /**
- * Created by 44067301 on 8/24/2017.
+ * Created by David Lee on 2017-08-24.
  */
 
 import org.jetbrains.annotations.NotNull;

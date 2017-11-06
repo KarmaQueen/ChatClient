@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.PrintStream;
 
 /**
- * Created by 44067301 on 8/31/2017.
+ * Created by David Lee on 2017-08-31.
  */
 public class ChatClientSimpleGUI extends Applet implements ActionListener{
 

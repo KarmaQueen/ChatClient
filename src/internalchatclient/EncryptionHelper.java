@@ -11,7 +11,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 /**
- * Created by 44067301 on 8/29/2017.
+ * Created by David Lee on 2017-08-29.
  */
 public class EncryptionHelper {
 

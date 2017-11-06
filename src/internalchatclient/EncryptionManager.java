@@ -5,7 +5,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
 /**
- * Created by 44067301 on 8/30/2017.
+ * Created by David Lee on 2017-08-30.
  */
 public class EncryptionManager extends EncryptionHelper{
 
